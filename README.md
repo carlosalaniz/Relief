@@ -2,4 +2,4 @@
 A decentralized food bank platform
 
 
-Copyright © 2020 Admint, LLC All Rights Reserved
+<sub><sup>Copyright © 2020 Admint, LLC All Rights Reserved<sub><sup>
