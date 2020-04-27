@@ -1,0 +1,7 @@
+{
+  "name": "relief",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
