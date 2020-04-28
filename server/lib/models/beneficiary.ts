@@ -1,8 +1,10 @@
 import * as mongoose from 'mongoose';
 import { isAgeGroupValid } from '../scripts/Users/beneficiaryEnums';
-import { IUser, UserSchema } from './user';
+import { UserSchema } from './user';
+import { IUser } from "./interfaces/IUser";
 import { UserRolesEnum } from '../scripts/Users/userRolesEnum';
-import { IDatable } from './IDatable';
+import DataModels from 'models';
+import { pointSchema } from './GeoJSONPoint';
 const Schema = mongoose.Schema;
 
 function getAge(birthDate: Date): number {
@@ -34,17 +36,11 @@ const HouseHoldMember = new Schema({
     ageGroup: {
         type: String,
         validate: isAgeGroupValid
+    },
+    headOfHouseHold: {
+        type: Boolean,
     }
 });
-
-export interface IBeneficiary extends IDatable {
-    headOfHouseHold: IUser,
-    householdInformation: {
-        sex: string,
-        allergies: string[],
-        ageGroup: string
-    }[]
-}
 
 export const BeneficiarySchema = new Schema({
     headOfHouseHold: {
@@ -52,7 +48,14 @@ export const BeneficiarySchema = new Schema({
         validate: validateHeadOfHouseHold
     },
     householdInformation: [HouseHoldMember],
-    address: mongoose.Types.ObjectId,
+    address: {
+        type: mongoose.Types.ObjectId,
+        ref: DataModels.Address.modelName
+    },
+    location: {
+        type: pointSchema,
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now

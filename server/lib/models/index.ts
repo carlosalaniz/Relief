@@ -1,16 +1,40 @@
 import { AddressSchema } from "./address";
 import { UserSchema } from "./user";
-import { ReliefPackageSchema } from "./reliefPackage";
+import { MealBoxSchema } from "./MealBox";
 import { ItemSchema } from "./items";
 import { DistributionCenterSchema } from "./distributionCenter";
 import { BeneficiarySchema } from "./beneficiary";
 import * as mongoose from "mongoose";
 
-export default {
-    Address: mongoose.model("Address", AddressSchema),
-    DistributionCenter: mongoose.model("DistributionCenter", DistributionCenterSchema),
-    Item: mongoose.model("Items", ItemSchema),
-    ReliefPackage: mongoose.model("ReliefPackages", ReliefPackageSchema),
-    User: mongoose.model("User", UserSchema),
-    Beneficiary: mongoose.model("Beneficiary", BeneficiarySchema)
-}
+interface IDataModel {
+    model: mongoose.Model<mongoose.Document, {}>;
+    modelName: string;
+};
+
+const DataModels: { Address: IDataModel, DistributionCenter: IDataModel, Item: IDataModel, User: IDataModel, Beneficiary: IDataModel, MealBox: IDataModel} = {
+    Address: {
+        model: mongoose.model("Address", AddressSchema),
+        modelName: "Address"
+    },
+    DistributionCenter: {
+        model: mongoose.model("DistributionCenter", DistributionCenterSchema),
+        modelName: "DistributionCenter"
+    },
+    Item: {
+        model: mongoose.model("Items", ItemSchema),
+        modelName: "Items"
+    },
+    User: {
+        model: mongoose.model("User", UserSchema),
+        modelName: "User"
+    },
+    Beneficiary: {
+        model: mongoose.model("Beneficiary", BeneficiarySchema),
+        modelName: "Beneficiary"
+    },
+    MealBox: {
+        model: mongoose.model("MealBox", MealBoxSchema),
+        modelName: "MealBox",
+    }
+};
+export default DataModels;
