@@ -8,5 +8,5 @@ export enum AgeGroupsEnum {
     NineToEleven = "NineToEleven", 
     TwelveToEighteen = "TwelveToEighteen", 
     NineteenToFiftyFive = "NineteenToFiftyFive", 
-    OverFiftyFive = "OverFiftyFive", 
+    OverFiftyFive = "OverFiftyFive"
 }

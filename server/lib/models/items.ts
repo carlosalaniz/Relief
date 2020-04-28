@@ -1,18 +1,6 @@
 import * as mongoose from 'mongoose';
-import { IDatable } from './IDatable';
 
 const Schema = mongoose.Schema;
-
-export interface IItems extends IDatable {
-    itemName: string,
-    pictureUrl: string,
-    nutritionalValue: {
-        caloriesPerPortion: number,
-        PortionValue: number,
-        PortionUnit: string,
-    }
-    tags: string[]
-}
 
 export const ItemSchema = new Schema({
     itemName: {

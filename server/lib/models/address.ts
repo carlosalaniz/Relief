@@ -1,16 +1,6 @@
 import * as mongoose from 'mongoose';
-import { IDatable } from './IDatable';
 
 const Schema = mongoose.Schema;
-
-export interface IAddress extends IDatable {
-    streetAddress: string,
-    addressLine2: string,
-    city: string,
-    state: string,
-    zipCode: string,
-    country: string
-}
 
 export const AddressSchema = new Schema({
     streetAddress: {
