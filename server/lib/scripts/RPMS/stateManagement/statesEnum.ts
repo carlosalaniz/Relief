@@ -1,3 +1,4 @@
+import { MealBoxStates } from "../../MealBox/MealBoxStates";
 
 
 export enum ItemStates {
@@ -12,6 +13,3 @@ export function isValueValidState(value: string) {
     return value in MealBoxStates;
 }
 
-export enum MealBoxStates {
-    pending_processing =  "pending_processing"
-}

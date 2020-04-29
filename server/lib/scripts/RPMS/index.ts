@@ -1,6 +1,6 @@
 import { IBeneficiaryFamily } from "models/interfaces/IBeneficiary";
 import { IMealBox as IMealBox } from "models/interfaces/IMealBox";
-import { MealBoxStates } from "./stateManagement/statesEnum";
+import { MealBoxStates } from "../MealBox/MealBoxStates";
 import { IHouseholdMemberInfo } from "models/interfaces/IHouseholdMemberInfo";
 import { IMealBoxItem } from "models/interfaces/IMealBoxItem";
 import DataModels from "../../models/index";
@@ -96,7 +96,7 @@ async function findCloseByDistributionCenters(pointGeometry: IPointGeometry, dis
 async function handleMealBoxRequest(request: RequestMealBox) {
     let requiredItems: IMealBoxItem[] = getRequiredItems(request.householdInformation);
     let mealBoxRequest: IMealBox = {
-        state: MealBoxStates.pending_processing,
+        status: MealBoxStates.pending_processing,
         requiredItems: requiredItems
     };
     const MealBoxModel = new DataModels.MealBox.model(mealBoxRequest);

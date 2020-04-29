@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
-import { MealBoxStates, isValueValidState } from '../scripts/RPMS/stateManagement/statesEnum';
+import { isValueValidState } from '../scripts/RPMS/stateManagement/statesEnum';
+import { MealBoxStates } from "../scripts/MealBox/MealBoxStates";
 import { ItemSchema } from './items';
 import { DistributionCenterSchema } from './distributionCenter';
 import { BeneficiarySchema } from './beneficiary';
@@ -7,7 +8,7 @@ import DataModels from "./index";
 
 const Schema = mongoose.Schema;
 export const MealBoxSchema = new Schema({
-    state: {
+    status: {
         type: String,
         default: MealBoxStates.pending_processing,
         validate: isValueValidState
