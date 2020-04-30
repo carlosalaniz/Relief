@@ -121,9 +121,14 @@ class DistributionCenter {
                 if (mealBoxAssigned) {
                     let availableSlots = this.getAvailableTimeSlots();
                     if (availableSlots.length > 0) {
-
+                        // todo: send notification to user.
                     } else {
-
+                        // todo: send notification to user, no time slots available.
+                        // todo: open new time slots
+                        // todo: rollback
+                            // todo: undo reserve stock
+                            // todo: undo mealAssignment
+                            // todo: trigger mealAssignment requeue
                     }
                 }
             }
