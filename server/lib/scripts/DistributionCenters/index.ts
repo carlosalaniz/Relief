@@ -27,6 +27,52 @@ class DistributionCenter {
     private async isStockAvailable(mealBox: IMealBox) {
         return DistributionCenterStatusEnum.Stocked;
     }
+
+    private async reserveStockAsync(mealBox: IMealBox) {
+        return true;
+    }
+
+    private getAvailableTimeSlots() {
+        return this._distributionCenter.availableSlots
+            .map((day, index) => {
+                day['index'] = index;
+                day.times = day.times.map((time, index) => {
+                    time['index'] = index;
+                    return time;
+                }).filter(time => !time.assignedMealBoxId);
+                return day;
+            }
+            )
+            .filter(day => day.times.length > 0);
+            // todo: return maximum 3 times. 
+    }
+
+    private async reserveTimeSlotsAsync(selectedTimeSlots, mealBox: IMealBox) {
+        try {
+            await _mongooseTransactionAsync(async () => {
+                let newSlots = this._distributionCenterDocument['availableSlots'];
+
+                selectedTimeSlots.forEach(timeSlot => {
+                    timeSlot.times.forEach(times => {
+                        newSlots[timeSlot.index].times[times.index].assignedMealBoxId = mealBox._id;
+                    });
+                })
+
+                let newDocument = await DataModels.DistributionCenter.model.findByIdAndUpdate(
+                    this._distributionCenter._id,
+                    { availableSlots: selectedTimeSlots },
+                    { new: true }
+                );
+
+                // update the class with it's new data
+                this.init(newDocument);
+            });
+        } catch (error) {
+            // todo: error handling 
+            console.log(error);
+        }
+    }
+
     public addRequestToProcessQueue(mealBox: Document) {
         //todo: implement queueing
     }
@@ -34,6 +80,18 @@ class DistributionCenter {
     public async sendStatusNotification(status) {
         //todo: add messaging queue
         console.warn(this._distributionCenter._id, status);
+    }
+
+    public async updateStatusAsync(status) {
+        await _mongooseTransactionAsync(async () => {
+            let newDocument = await DataModels.DistributionCenter.model.findByIdAndUpdate(
+                this._distributionCenter._id,
+                { status: status },
+                { new: true }
+            );
+            // update the class with it's new data
+            this.init(newDocument);
+        });
     }
 
     public async processQueueElementsAsync() {
@@ -51,24 +109,23 @@ class DistributionCenter {
                 await this.sendStatusNotification(DistributionCenterStatusEnum.Empty);
 
                 //save new state
-                await _mongooseTransactionAsync(async () => {
-                    let newDocument = await DataModels.DistributionCenter.model.findByIdAndUpdate(
-                        this._distributionCenter._id,
-                        { status: DistributionCenterStatusEnum.Empty },
-                        { new: true }
-                    );
-                    this.init(newDocument);
-                });
+                await this.updateStatusAsync(DistributionCenterStatusEnum.Empty)
 
                 //end loop
                 break;
             }
 
             //Process MealBox
-            let mealBoxAssigned = mealBox.assignMealBox(this._distributionCenter);
-            if(mealBoxAssigned){
-                // if box is successfully locked process
-                //todo: process
+            if (await this.reserveStockAsync(mealBox._mealBox)) {
+                let mealBoxAssigned = mealBox.assignMealBox(this._distributionCenter);
+                if (mealBoxAssigned) {
+                    let availableSlots = this.getAvailableTimeSlots();
+                    if (availableSlots.length > 0) {
+
+                    } else {
+
+                    }
+                }
             }
         };
     }

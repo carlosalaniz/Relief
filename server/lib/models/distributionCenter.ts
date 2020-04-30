@@ -19,12 +19,27 @@ export const DistributionCenterSchema = new Schema({
         type: String
     },
 
+    availableSlots: [
+        {
+            day: Number,
+            times: [
+                {
+                    startTime: Date,
+                    endTime: Date,
+                    status: String,
+                    assignedMealBoxId: mongoose.Types.ObjectId
+                }
+            ]
+        }
+    ],
+
+
     stock: {
         type: [{
             amount: Number,
             quantity: Number,
             quantityUnit: String,
-            item_objectId: mongoose.Types.ObjectId,
+            itemId: mongoose.Types.ObjectId,
             item: ItemSchema
         }]
     },
