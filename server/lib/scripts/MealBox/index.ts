@@ -16,8 +16,12 @@ class MealBox {
         this._mealBox = <IMealBox>(<any>distributionCenter);
     }
 
+
     public async assignMealBox(distributionCenter: IDistributionCenter) {
-        //todo: implement
-        return true;
+        return await DataModels.MealBox.model.findByIdAndUpdate(
+            this._mealBox._id,
+            { distributionCenter: distributionCenter._id },
+            { new: true }
+        );
     }
 }

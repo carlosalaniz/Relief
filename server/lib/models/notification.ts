@@ -1,13 +1,21 @@
-import { Schema, Types } from "mongoose";
+import { Schema, Types, SchemaType } from "mongoose";
 import DataModels from ".";
 
 export const NotificationSchema = new Schema({
     channel: String,
-    message: Schema.Types.Mixed,
+
+    message: {
+        type: {
+            type: String,
+            payload: Schema.Types.Mixed
+        }
+    },
+
     model: {
         type: String,
         index: true
     },
+    
     for: {
         type: Types.ObjectId,
         index: true
