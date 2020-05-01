@@ -16,11 +16,18 @@ export const MealBoxSchema = new Schema({
 
     beneficiary: BeneficiarySchema,
 
-    items: [{
-        quantity: Number,
-        quantityUnit: String,
-        item: ItemSchema
-    }],
+    items: {
+        type: [{
+            amount: Number,
+            quantity: Number,
+            quantityUnit: String,
+            itemId: {
+                type: mongoose.Types.ObjectId,
+                ref: DataModels.Item.modelName
+            },
+            item: ItemSchema
+        }]
+    },
 
     donors: [
         // sub document array of donors
@@ -38,7 +45,10 @@ export const MealBoxSchema = new Schema({
         }
     ],
 
-    distributionCenter: DistributionCenterSchema,
+    distributionCenter: {
+        type: mongoose.Types.ObjectId,
+        ref: DataModels.DistributionCenter.modelName
+    },
 
     pickupTime: {
         type: Date

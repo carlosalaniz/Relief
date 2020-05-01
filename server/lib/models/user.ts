@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 import { isValidUserRole } from '../scripts/Users/userRolesEnum';
-import { DataModels } from 'models';
+import DataModels from '.';
 
 const Schema = mongoose.Schema;
 export const UserSchema = new Schema({
@@ -26,13 +26,21 @@ export const UserSchema = new Schema({
         required: 'dateOfBirth is required.'
     },
 
+    address: {
+        type: mongoose.Types.ObjectId, ref: DataModels.Address.modelName
+    },
+
+    notifications: [{
+        type: mongoose.Types.ObjectId,
+        ref: DataModels.Notification.modelName
+    }],
+
     roles: {
         type: [String],
         required: 'role is required',
         validate: (arr: string[]) => arr.every(isValidUserRole)
     },
 
-    address: { type: mongoose.Types.ObjectId, ref: DataModels.Address.modelName },
 
     createdAt: {
         type: Date,

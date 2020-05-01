@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import { UserSchema } from './user';
-import DataModels from 'models';
-import { pointSchema } from './GeoJSONPoint';
+import DataModels from '.';
+import { pointSchema } from './geoJSONPoint';
 import { ItemSchema } from './items';
 const Schema = mongoose.Schema;
 
@@ -27,7 +27,10 @@ export const DistributionCenterSchema = new Schema({
                     startTime: Date,
                     endTime: Date,
                     status: String,
-                    assignedMealBoxId: mongoose.Types.ObjectId
+                    assignedMealBoxId: {
+                        type: mongoose.Types.ObjectId,
+                        ref: DataModels.MealBox.modelName
+                    }
                 }
             ]
         }
@@ -39,7 +42,10 @@ export const DistributionCenterSchema = new Schema({
             amount: Number,
             quantity: Number,
             quantityUnit: String,
-            itemId: mongoose.Types.ObjectId,
+            itemId: {
+                type: mongoose.Types.ObjectId,
+                ref: DataModels.Item.modelName
+            },
             item: ItemSchema
         }]
     },
@@ -56,8 +62,16 @@ export const DistributionCenterSchema = new Schema({
     },
 
     mealBoxQueue: {
-        type: [String]
+        type: [{
+            type: mongoose.Types.ObjectId,
+            ref: DataModels.Notification.modelName
+        }]
     },
+
+    notifications: [{
+        type: mongoose.Types.ObjectId,
+        ref: DataModels.Notification.modelName
+    }],
 
     createdAt: {
         type: Date,
