@@ -85,7 +85,8 @@ const SchemaDefinition = new Schema({
     },
 });
 
-export const DistributionCenterSchema: { schema: mongoose.Schema, modelName: string } = {
+export const DistributionCenterSchema = {
     schema: SchemaDefinition,
-    modelName: "DistributionCenter"
+    modelName: "DistributionCenter",
+    model: mongoose.model("DistributionCenter", SchemaDefinition)
 }

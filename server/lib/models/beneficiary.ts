@@ -1,10 +1,10 @@
 import * as mongoose from 'mongoose';
-import { isAgeGroupValid } from '../scripts/Users/beneficiaryEnums';
+import { isAgeGroupValid } from '../scripts/Users/ageGroupsEnum';
 import { UserSchema } from './user';
-import { IUser } from "./interfaces/IUser";
-import { UserRolesEnum } from '../scripts/Users/userRolesEnum';
 import { pointSchema } from './geoJSONPoint';
 import { AddressSchema } from './address';
+import { DataModels } from './';
+import { IUser } from './interfaces/IUser';
 const Schema = mongoose.Schema;
 
 function getAge(birthDate: Date): number {
@@ -17,9 +17,9 @@ function getAge(birthDate: Date): number {
     return age;
 }
 
-function validateHeadOfHouseHold(headOfHouseHold: IUser): boolean {
-    return getAge(headOfHouseHold.dateOfBirth) >= 18
-        && headOfHouseHold.roles.indexOf(UserRolesEnum.Donor) >= 0;
+async function validateHeadOfHouseHold(headOfHouseHold: mongoose.Types.ObjectId) {
+    let user = await <any>UserSchema.model.findById(headOfHouseHold);
+    return getAge(user.dateOfBirth) >= 18;
 }
 
 
@@ -67,7 +67,9 @@ const SchemaDefinition = new Schema({
     },
 });
 
-export const BeneficiarySchema ={
+export const BeneficiarySchema = {
     schema: SchemaDefinition,
-    modelName : "Beneficiary"
+    modelName: "Beneficiary",
+    model: mongoose.model("Beneficiary", SchemaDefinition)
+
 }

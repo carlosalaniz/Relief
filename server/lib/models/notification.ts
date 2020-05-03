@@ -4,12 +4,9 @@ import { Schema, Types, SchemaType } from "mongoose";
 export const SchemaDefinition = new Schema({
     channel: String,
 
-    message: {
-        type: {
-            type: String,
-            payload: Schema.Types.Mixed
-        }
-    },
+    messageType: String,
+    
+    messagePayload:String,
 
     model: {
         type: String,
@@ -30,7 +27,8 @@ export const SchemaDefinition = new Schema({
     },
 });
 
-export const NotificationSchema: { schema: mongoose.Schema, modelName: string } = {
+export const NotificationSchema = {
     schema: SchemaDefinition,
-    modelName: "Notification"
+    modelName: "Notification",
+    model: mongoose.model("Notification", SchemaDefinition)
 }

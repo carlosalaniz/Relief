@@ -12,7 +12,8 @@ export const SchemaDefinition = new mongoose.Schema({
     }
 });
 
-export const pointSchema: { schema: mongoose.Schema, modelName: string } = {
+export const pointSchema = {
     schema: SchemaDefinition,
-    modelName: "point"
+    modelName: "point",
+    model: mongoose.model( "point", SchemaDefinition)
 }

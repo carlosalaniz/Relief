@@ -1,4 +1,4 @@
-import { DataModels }  from "../../models";
+import { DataModels } from "../../models";
 import { Document, Types } from "mongoose";
 import { DistributionCenterStatusEnum } from "./DistributionCenterStatusEnum";
 import { IDistributionCenter } from "../../models/interfaces/IDistributionCenter";
@@ -157,10 +157,8 @@ export class DistributionCenter {
                 await this.notifyDistributionCenter(
                     {
                         channel: DistributionCenterChannelEnum.DistributionCenterStockStatus,
-                        message: {
-                            type: MealBoxUpdatesMessageType.StatusUpdates,
-                            payload: DistributionCenterStatusEnum.Empty
-                        }
+                        messageType: MealBoxUpdatesMessageType.StatusUpdates,
+                        messagePayload: DistributionCenterStatusEnum.Empty
                     }
                 );
 
@@ -186,10 +184,8 @@ export class DistributionCenter {
                                 let user = await UserManager.get(headOfHouseHoldId)
                                 await user.notifyUserAsync({
                                     channel: UserNotificationChannelEnum.MealBoxUpdates,
-                                    message: {
-                                        type: MealBoxUpdatesMessageType.TimeSelectionMessage,
-                                        payload: availableSlots
-                                    }
+                                    messageType: MealBoxUpdatesMessageType.TimeSelectionMessage,
+                                    messagePayload: JSON.stringify(availableSlots)
                                 });
                             } else {
                                 throw new Error(this.errors.NoTimeSlotsAvailable)
@@ -208,32 +204,32 @@ export class DistributionCenter {
 
                 let channel = null;
                 let message = {
-                    type: null,
-                    payload: null
+                    messageType: null,
+                    messagePayload: null
                 }
 
                 switch (error.message) {
                     case this.errors.StockUnAvailable:
                         channel = UserNotificationChannelEnum.MealBoxUpdates;
-                        message.type = MealBoxUpdatesMessageType.ErrorProcessing;
-                        message.payload = this.errors.StockUnAvailable;
+                        message.messageType = MealBoxUpdatesMessageType.ErrorProcessing;
+                        message.messagePayload = this.errors.StockUnAvailable;
                         break;
                     case this.errors.MealBoxAssigned:
                         channel = UserNotificationChannelEnum.MealBoxUpdates;
-                        message.type = MealBoxUpdatesMessageType.ErrorProcessing;
-                        message.payload = this.errors.StockUnAvailable;
+                        message.messageType = MealBoxUpdatesMessageType.ErrorProcessing;
+                        message.messagePayload = this.errors.StockUnAvailable;
                         break;
                     case this.errors.NoTimeSlotsAvailable:
                         channel = UserNotificationChannelEnum.MealBoxUpdates;
-                        message.type = MealBoxUpdatesMessageType.ErrorProcessing;
-                        message.payload = this.errors.StockUnAvailable;
+                        message.messageType = MealBoxUpdatesMessageType.ErrorProcessing;
+                        message.messagePayload = this.errors.StockUnAvailable;
                         break;
                 }
 
                 await _mongooseTransactionAsync(async () => {
                     await user.notifyUserAsync({
                         channel: channel,
-                        message: message
+                        ...message
                     });
                 });
             }
@@ -253,10 +249,8 @@ export class DistributionCenter {
                 let user = await UserManager.get(userId);
                 await user.notifyUserAsync({
                     channel: UserNotificationChannelEnum.MealBoxUpdates,
-                    message: {
-                        type: MealBoxUpdatesMessageType.TimeSelectionMessage,
-                        payload: selectedTimeSlot
-                    }
+                    messageType: MealBoxUpdatesMessageType.TimeSelectionMessage,
+                    messagePayload: JSON.stringify(selectedTimeSlot)
                 })
             })
         } catch (e) {

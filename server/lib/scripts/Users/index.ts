@@ -42,12 +42,17 @@ export class User {
     }
 
     public async notifyUserAsync(message: INotification) {
-        let notification = message;
-        message.for = this._user._id;
-        message.model = DataModels.User.modelName;
         let userNotificationDocument = null;
-        userNotificationDocument = await new DataModels.Notification.model(notification);
-        userNotificationDocument.save();
+        await _mongooseTransactionAsync(async () => {
+            let notification = message;
+            message.for = this._user._id;
+            message.model = DataModels.User.modelName;
+            userNotificationDocument = await new DataModels.Notification.model(notification);
+            userNotificationDocument.save();
+            let user = <any>await DataModels.User.model.findById(this._user._id);
+            user.notifications.push(userNotificationDocument._id);
+            let new_user = await user.save()
+        })
         return userNotificationDocument;
     }
 }

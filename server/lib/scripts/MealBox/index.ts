@@ -1,5 +1,5 @@
-import { DataModels }  from "models";
-import { IMealBox } from "models/interfaces/IMealBox";
+import { DataModels }  from "../../models";
+import { IMealBox } from "../../models/interfaces/IMealBox";
 import { MongooseDocument } from "mongoose";
 import { IDistributionCenter } from "../../models/interfaces/IDistributionCenter";
 

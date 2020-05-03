@@ -63,7 +63,8 @@ const SchemaDefinition = new Schema({
     },
 });
 
-export const MealBoxSchema: { schema: mongoose.Schema, modelName: string } = {
+export const MealBoxSchema = {
     schema: SchemaDefinition,
-    modelName: "MealBox"
+    modelName: "MealBox",
+    model: mongoose.model("MealBox", SchemaDefinition)
 }

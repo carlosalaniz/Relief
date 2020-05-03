@@ -1,8 +1,8 @@
 import { IMealBox as IMealBox } from "../../models/interfaces/IMealBox";
 import { MealBoxStates } from "../MealBox/MealBoxStates";
-import { IHouseholdMemberInfo } from "models/interfaces/IHouseholdMemberInfo";
+import { IHouseholdMemberInfo } from "../../models/interfaces/IHouseholdMemberInfo";
 import { IMealBoxItem } from "../../models/interfaces/IMealBoxItem";
-import { DataModels }  from "../../models/index";
+import { DataModels } from "../../models/index";
 import { RequestMealBox } from "./dtos/RequestDtos";
 import { _mongooseTransactionAsync, defaults } from "../../scripts/common";
 import { IPointGeometry } from "../../models/interfaces/IGeoJSONPoint";
@@ -11,7 +11,7 @@ import { UserManager } from "../../scripts/Users";
 import { UserNotificationChannelEnum } from "../../scripts/common/UserNotificationChannelEnum";
 import { MealBoxUpdatesMessageType } from "../../scripts/Users/MealBoxUpdatesMessageType";
 
-class RPMS {
+export class RPMS {
     private RPMSErrors = {
         NoDistributionCenterAvailableInArea: "NoDistributionCenterAvailableInArea"
     }
@@ -129,14 +129,13 @@ class RPMS {
                     let user = await UserManager.get(request.headOfHouseHoldId)
                     await user.notifyUserAsync({
                         channel: UserNotificationChannelEnum.MealBoxUpdates,
-                        message: {
-                            type: MealBoxUpdatesMessageType.ErrorProcessing,
-                            payload: this.RPMSErrors.NoDistributionCenterAvailableInArea
-                        }
+                        messageType: MealBoxUpdatesMessageType.ErrorProcessing,
+                        messagePayload: this.RPMSErrors.NoDistributionCenterAvailableInArea
                     });
                 }
             });
         } catch (error) {
+            console.log(error);
             //TODO: do something
         }
     }

@@ -54,7 +54,8 @@ const SchemaDefinition = new Schema({
     },
 });
 
-export const UserSchema: { schema: mongoose.Schema, modelName: string } = {
+export const UserSchema = {
     schema: SchemaDefinition,
-    modelName: "User"
+    modelName: "User",
+    model: mongoose.model("User", SchemaDefinition)
 }

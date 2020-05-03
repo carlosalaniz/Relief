@@ -2,10 +2,8 @@ import { ITimeStampable } from "./ITimeStampable";
 
 export interface INotification extends ITimeStampable {
     channel: string,
-    message: {
-        type: string,
-        payload: any
-    },
+    messageType: string
+    messagePayload: string
     model?: string,
     for?: any
 }

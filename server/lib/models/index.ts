@@ -8,38 +8,17 @@ import { BeneficiarySchema } from "./beneficiary";
 import { NotificationSchema } from "./notification";
 
 export const DataModels = {
-    Address: {
-        model: mongoose.model(AddressSchema.modelName, AddressSchema.schema),
-        modelName: AddressSchema.modelName
-    },
+    Address: AddressSchema,
 
-    DistributionCenter: {
-        model: mongoose.model(DistributionCenterSchema.modelName, DistributionCenterSchema.schema),
-        modelName: DistributionCenterSchema.modelName
-    },
+    DistributionCenter: DistributionCenterSchema,
 
-    Item: {
-        model: mongoose.model(ItemSchema.modelName, ItemSchema.schema),
-        modelName: ItemSchema.modelName
-    },
+    Item: ItemSchema,
 
-    User: {
-        model: mongoose.model(UserSchema.modelName, UserSchema.schema),
-        modelName: UserSchema.modelName
-    },
+    User: UserSchema,
 
-    Beneficiary: {
-        model: mongoose.model(BeneficiarySchema.modelName, BeneficiarySchema.schema),
-        modelName: BeneficiarySchema.modelName
-    },
+    Beneficiary: BeneficiarySchema,
 
-    MealBox: {
-        model: mongoose.model(MealBoxSchema.modelName, MealBoxSchema.schema),
-        modelName: MealBoxSchema.modelName
-    },
+    MealBox: MealBoxSchema,
 
-    Notification: {
-        model: mongoose.model(NotificationSchema.modelName, NotificationSchema.schema),
-        modelName: NotificationSchema.modelName,
-    }
+    Notification: NotificationSchema
 };

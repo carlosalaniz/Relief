@@ -31,7 +31,12 @@ const SchemaDefinition = new Schema({
     },
 });
 
-export const AddressSchema: { schema: mongoose.Schema, modelName: string } = {
+export const AddressSchema: {
+    schema: mongoose.Schema<any>;
+    modelName: string;
+    model: mongoose.Model<mongoose.Document, {}>;
+} = {
     schema: SchemaDefinition,
-    modelName: "Address"
+    modelName: "Address",
+    model: mongoose.model("Address", SchemaDefinition)
 }
