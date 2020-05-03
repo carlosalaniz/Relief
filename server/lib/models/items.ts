@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-export const ItemSchema = new Schema({
+const SchemaDefinition = new Schema({
     itemName: {
         type: String,
         required: 'itemName is required.'
@@ -42,3 +42,8 @@ export const ItemSchema = new Schema({
         default: Date.now
     },
 }); 
+
+export const ItemSchema: { schema: mongoose.Schema, modelName: string } = {
+    schema: SchemaDefinition,
+    modelName: "Item"
+}

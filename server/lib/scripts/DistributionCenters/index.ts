@@ -1,4 +1,4 @@
-import DataModels from "../../models";
+import { DataModels }  from "../../models";
 import { Document, Types } from "mongoose";
 import { DistributionCenterStatusEnum } from "./DistributionCenterStatusEnum";
 import { IDistributionCenter } from "../../models/interfaces/IDistributionCenter";
@@ -265,7 +265,4 @@ export class DistributionCenter {
             throw e;
         }
     }
-
-
-
 }

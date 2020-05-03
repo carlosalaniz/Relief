@@ -2,19 +2,18 @@ import * as mongoose from 'mongoose';
 import { isValueValidState } from '../scripts/RPMS/stateManagement/statesEnum';
 import { MealBoxStates } from "../scripts/MealBox/MealBoxStates";
 import { ItemSchema } from './items';
-import { DistributionCenterSchema } from './distributionCenter';
 import { BeneficiarySchema } from './beneficiary';
-import DataModels from "./index";
+import { UserSchema } from './user';
 
 const Schema = mongoose.Schema;
-export const MealBoxSchema = new Schema({
+const SchemaDefinition = new Schema({
     status: {
         type: String,
         default: MealBoxStates.pending_processing,
         validate: isValueValidState
     },
 
-    beneficiary: BeneficiarySchema,
+    beneficiary: BeneficiarySchema.schema,
 
     items: {
         type: [{
@@ -23,9 +22,9 @@ export const MealBoxSchema = new Schema({
             quantityUnit: String,
             itemId: {
                 type: mongoose.Types.ObjectId,
-                ref: DataModels.Item.modelName
+                ref: ItemSchema.modelName
             },
-            item: ItemSchema
+            item: ItemSchema.schema
         }]
     },
 
@@ -33,7 +32,7 @@ export const MealBoxSchema = new Schema({
         // sub document array of donors
         {
             type: mongoose.Types.ObjectId,
-            ref: DataModels.User.modelName
+            ref: UserSchema.modelName
         }
     ],
 
@@ -41,13 +40,12 @@ export const MealBoxSchema = new Schema({
         // sub document array of volunteers
         {
             type: mongoose.Types.ObjectId,
-            ref: DataModels.User.modelName
+            ref: UserSchema.modelName
         }
     ],
 
     distributionCenter: {
-        type: mongoose.Types.ObjectId,
-        ref: DataModels.DistributionCenter.modelName
+        type: mongoose.Types.ObjectId
     },
 
     pickupTime: {
@@ -64,3 +62,8 @@ export const MealBoxSchema = new Schema({
         default: Date.now
     },
 });
+
+export const MealBoxSchema: { schema: mongoose.Schema, modelName: string } = {
+    schema: SchemaDefinition,
+    modelName: "MealBox"
+}

@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-export const SampleSchema = new Schema({
+const SchemaDefinition = new Schema({
     firstName: {
         type: String,
         required: 'Enter a first name'
@@ -16,3 +16,9 @@ export const SampleSchema = new Schema({
         required: 'give me a message!'
     }
 });
+
+
+export const SampleSchema = {
+    schema: SchemaDefinition,
+    modelName: "Sample"
+}

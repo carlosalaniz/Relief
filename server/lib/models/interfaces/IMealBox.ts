@@ -3,7 +3,7 @@ import { ITimeStampable } from './ITimeStampable';
 import { IMealBoxItem } from "./IMealBoxItem";
 import { IBeneficiaryFamily } from "./IBeneficiary";
 import { Types } from "mongoose";
-import DataModels from "../../models";
+import { DataModels }  from "../../models";
 export interface IMealBox extends ITimeStampable {
     status: string;
     requiredItems: IMealBoxItem[];

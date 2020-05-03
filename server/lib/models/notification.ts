@@ -1,7 +1,7 @@
+import * as mongoose from "mongoose"
 import { Schema, Types, SchemaType } from "mongoose";
-import DataModels from ".";
 
-export const NotificationSchema = new Schema({
+export const SchemaDefinition = new Schema({
     channel: String,
 
     message: {
@@ -15,7 +15,7 @@ export const NotificationSchema = new Schema({
         type: String,
         index: true
     },
-    
+
     for: {
         type: Types.ObjectId,
         index: true
@@ -29,3 +29,8 @@ export const NotificationSchema = new Schema({
         default: Date.now
     },
 });
+
+export const NotificationSchema: { schema: mongoose.Schema, modelName: string } = {
+    schema: SchemaDefinition,
+    modelName: "Notification"
+}

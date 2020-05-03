@@ -2,12 +2,12 @@ import * as mongoose from 'mongoose';
 import { SampleSchema } from '../models/sampleModel';
 import { Request, Response } from 'express';
 
-const Sample = mongoose.model('Sample', SampleSchema);
+const Sample = mongoose.model('Sample', SampleSchema.schema);
 export class SampleController {
 
     public getAllSample(req: Request, res: Response) {
         Sample.find({}, (err, sample) => {
-            if(err){
+            if (err) {
                 res.send(err);
             }
             res.json(sample);

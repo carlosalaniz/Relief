@@ -2,7 +2,7 @@ import { IMealBox as IMealBox } from "../../models/interfaces/IMealBox";
 import { MealBoxStates } from "../MealBox/MealBoxStates";
 import { IHouseholdMemberInfo } from "models/interfaces/IHouseholdMemberInfo";
 import { IMealBoxItem } from "../../models/interfaces/IMealBoxItem";
-import DataModels from "../../models/index";
+import { DataModels }  from "../../models/index";
 import { RequestMealBox } from "./dtos/RequestDtos";
 import { _mongooseTransactionAsync, defaults } from "../../scripts/common";
 import { IPointGeometry } from "../../models/interfaces/IGeoJSONPoint";

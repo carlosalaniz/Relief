@@ -3,8 +3,8 @@ import { isAgeGroupValid } from '../scripts/Users/beneficiaryEnums';
 import { UserSchema } from './user';
 import { IUser } from "./interfaces/IUser";
 import { UserRolesEnum } from '../scripts/Users/userRolesEnum';
-import DataModels from 'models';
 import { pointSchema } from './geoJSONPoint';
+import { AddressSchema } from './address';
 const Schema = mongoose.Schema;
 
 function getAge(birthDate: Date): number {
@@ -42,19 +42,19 @@ const HouseHoldMember = new Schema({
     }
 });
 
-export const BeneficiarySchema = new Schema({
+const SchemaDefinition = new Schema({
     headOfHouseHold: {
         type: mongoose.Types.ObjectId,
-        ref: DataModels.User.modelName,
+        ref: UserSchema.modelName,
         validate: validateHeadOfHouseHold
     },
     householdInformation: [HouseHoldMember],
     address: {
         type: mongoose.Types.ObjectId,
-        ref: DataModels.Address.modelName
+        ref: AddressSchema.modelName
     },
     location: {
-        type: pointSchema,
+        type: pointSchema.schema,
         required: true
     },
     createdAt: {
@@ -66,3 +66,8 @@ export const BeneficiarySchema = new Schema({
         default: Date.now
     },
 });
+
+export const BeneficiarySchema ={
+    schema: SchemaDefinition,
+    modelName : "Beneficiary"
+}

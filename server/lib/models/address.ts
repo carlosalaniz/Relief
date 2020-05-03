@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-export const AddressSchema = new Schema({
+const SchemaDefinition = new Schema({
     streetAddress: {
         type: String
     },
@@ -30,3 +30,8 @@ export const AddressSchema = new Schema({
         default: Date.now
     },
 });
+
+export const AddressSchema: { schema: mongoose.Schema, modelName: string } = {
+    schema: SchemaDefinition,
+    modelName: "Address"
+}

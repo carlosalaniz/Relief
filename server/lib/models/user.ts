@@ -1,9 +1,10 @@
 import * as mongoose from 'mongoose';
 import { isValidUserRole } from '../scripts/Users/userRolesEnum';
-import DataModels from '.';
-
+import { AddressSchema } from './address';
+import { NotificationSchema } from './notification';
 const Schema = mongoose.Schema;
-export const UserSchema = new Schema({
+
+const SchemaDefinition = new Schema({
     email: {
         type: String,
         unique: true,
@@ -27,12 +28,12 @@ export const UserSchema = new Schema({
     },
 
     address: {
-        type: mongoose.Types.ObjectId, ref: DataModels.Address.modelName
+        type: mongoose.Types.ObjectId, ref: AddressSchema.modelName
     },
 
     notifications: [{
         type: mongoose.Types.ObjectId,
-        ref: DataModels.Notification.modelName
+        ref: NotificationSchema.modelName
     }],
 
     roles: {
@@ -52,3 +53,8 @@ export const UserSchema = new Schema({
         default: Date.now
     },
 });
+
+export const UserSchema: { schema: mongoose.Schema, modelName: string } = {
+    schema: SchemaDefinition,
+    modelName: "User"
+}

@@ -1,12 +1,13 @@
 import * as mongoose from 'mongoose';
-import DataModels from '.';
+import { ItemSchema } from './items';
+
 
 const Schema = mongoose.Schema;
 
-export const ItemsNeededSchema = new Schema({
+const SchemaDefinition = new Schema({
     item: {
         type: mongoose.Types.ObjectId,
-        ref: DataModels.Item.modelName,
+        ref: ItemSchema.modelName,
         required: 'item id is required'
     },
     message: {
@@ -14,3 +15,9 @@ export const ItemsNeededSchema = new Schema({
         required: 'give me a message!'
     }
 });
+
+
+export const ItemsNeededSchema: { schema: mongoose.Schema, modelName: string } = {
+    schema: SchemaDefinition,
+    modelName: "ItemsNeeded"
+}

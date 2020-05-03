@@ -1,17 +1,34 @@
 import * as mongoose from 'mongoose';
 import { UserSchema } from './user';
-import DataModels from '.';
 import { pointSchema } from './geoJSONPoint';
 import { ItemSchema } from './items';
+import { MealBoxSchema } from './mealBox';
+import { AddressSchema } from './address';
+import { NotificationSchema } from './notification';
 const Schema = mongoose.Schema;
 
-export const DistributionCenterSchema = new Schema({
+const availableSlotsSchema = new Schema({
+    day: Number,
+    times: [
+        {
+            startTime: Date,
+            endTime: Date,
+            status: String,
+            assignedMealBoxId: {
+                type: mongoose.Types.ObjectId,
+                ref: MealBoxSchema.modelName
+            }
+        }
+    ]
+});
+
+const SchemaDefinition = new Schema({
     name: {
         type: String
     },
 
     host: {
-        type: UserSchema,
+        type: UserSchema.schema,
         required: true
     },
 
@@ -19,23 +36,7 @@ export const DistributionCenterSchema = new Schema({
         type: String
     },
 
-    availableSlots: [
-        {
-            day: Number,
-            times: [
-                {
-                    startTime: Date,
-                    endTime: Date,
-                    status: String,
-                    assignedMealBoxId: {
-                        type: mongoose.Types.ObjectId,
-                        ref: DataModels.MealBox.modelName
-                    }
-                }
-            ]
-        }
-    ],
-
+    availableSlots: [availableSlotsSchema],
 
     stock: {
         type: [{
@@ -44,33 +45,33 @@ export const DistributionCenterSchema = new Schema({
             quantityUnit: String,
             itemId: {
                 type: mongoose.Types.ObjectId,
-                ref: DataModels.Item.modelName
+                ref: ItemSchema.modelName
             },
-            item: ItemSchema
+            item: ItemSchema.schema
         }]
     },
 
     address: {
         type: mongoose.Types.ObjectId,
-        ref: DataModels.Address.modelName,
+        ref: AddressSchema.modelName,
         required: true
     },
 
     location: {
-        type: pointSchema,
+        type: pointSchema.schema,
         required: true
     },
 
     mealBoxQueue: {
         type: [{
             type: mongoose.Types.ObjectId,
-            ref: DataModels.Notification.modelName
+            ref: MealBoxSchema.modelName
         }]
     },
 
     notifications: [{
         type: mongoose.Types.ObjectId,
-        ref: DataModels.Notification.modelName
+        ref: NotificationSchema.modelName
     }],
 
     createdAt: {
@@ -83,3 +84,8 @@ export const DistributionCenterSchema = new Schema({
         default: Date.now
     },
 });
+
+export const DistributionCenterSchema: { schema: mongoose.Schema, modelName: string } = {
+    schema: SchemaDefinition,
+    modelName: "DistributionCenter"
+}

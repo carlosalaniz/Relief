@@ -1,5 +1,5 @@
 import { IUser } from "../../models/interfaces/IUser";
-import DataModels from "../../models";
+import { DataModels }  from "../../models";
 import { Document } from "mongoose"
 import { INotification } from "../../models/interfaces/INotification";
 import { _mongooseTransactionAsync } from "../../scripts/common";
