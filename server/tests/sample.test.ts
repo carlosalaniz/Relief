@@ -16,7 +16,6 @@ import { DataModels } from "../lib/models";
 initMongo();
 
 async function InsertUser() {
-    console.log("inserting user")
     let addressData: IAddress = {
         streetAddress: "1206 honeysuckle ln",
         city: "Pflugerville",
@@ -38,7 +37,6 @@ async function InsertUser() {
 }
 
 async function issueMealBoxRequest(user) {
-    console.log("creating meal box request object")
     let RequestMealBox: RequestMealBox = {
         headOfHouseHoldId: user.getObject()._id,
         location: {
@@ -74,28 +72,13 @@ async function issueMealBoxRequest(user) {
 
 describe('Insertions', function () {
     it('Insert User', async function () {
-        console.log("deleting collections before beginning testing")
+        // Drop everything before starting
         await dropAllCollectionsAsync(mongoose);
-        console.log("done");
 
-        let addressData: IAddress = {
-            streetAddress: "1206 honeysuckle ln",
-            city: "Pflugerville",
-            state: "TX",
-            zipCode: "78660",
-            country: "US"
-        };
-        let userData: IUser = {
-            email: "carlos@gmail.com",
-            firstName: "carlos",
-            lastName: "alaniz",
-            dateOfBirth: new Date("09/14/1993"),
-            roles: [UserRolesEnum.Volunteer]
-        };
-        console.log("inserting user")
-        let result = <any>await UserManager.create(userData, addressData);
-        console.log("done")
-        let user = await UserManager.get(result._id)
+        // Insert user
+        let user = await InsertUser();
+
+        // Document to Object
         let obj = user.getObject();
         assert(obj);
     });
@@ -104,13 +87,13 @@ describe('Insertions', function () {
 describe('Queue processing', function () {
 
     it('Create Meal Box Request - No Distribution centers in area', async function () {
-        console.log("deleting collections")
+        // Drop everything before starting
         await dropAllCollectionsAsync(mongoose);
 
-        console.log("inserting user")
+        // Insert user
         let user = await InsertUser();
 
-        console.log("creating meal box request object")
+        // Issue a request for a Meal Box
         let handleResponse = await issueMealBoxRequest(user);
 
         let beforeNotifications = user.getObject().notifications;
