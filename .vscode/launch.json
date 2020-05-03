@@ -7,6 +7,23 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Mocha Current File",
+            "program": "${workspaceFolder}\\server\\node_modules\\mocha\\bin\\_mocha",
+            "args": [
+                "--no-timeouts",
+                "--colors",
+                "${file}",
+                "--require",
+                "ts-node/register",
+                "${workspaceFolder}/server/tests"
+            ],
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Launch Program",
             "skipFiles": [
                 "<node_internals>/**"

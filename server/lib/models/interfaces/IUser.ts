@@ -6,7 +6,7 @@ export interface IUser extends ITimeStampable {
     firstName: string;
     lastName: string;
     dateOfBirth: Date;
-    address: any;
-    notifications: Types.ObjectId[],
+    address?: Types.ObjectId;
+    notifications?: Types.ObjectId[],
     roles: UserRolesEnum[];
 }
