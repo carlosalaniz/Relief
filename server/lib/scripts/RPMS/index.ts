@@ -113,6 +113,8 @@ export class RPMS {
         };
         const MealBoxModel = new DataModels.MealBox.model(mealBoxRequest);
         try {
+            let notification = null;
+            let distributionCenters = null
             await _mongooseTransactionAsync(async () => {
                 let mealBox = await MealBoxModel.save();
                 let closestDistributionCenters = await this.findCloseByDistributionCentersAsync(request.location);
@@ -125,15 +127,19 @@ export class RPMS {
                             //TODO: do something
                         }
                     })
+                    distributionCenters = closestDistributionCenters;
                 } else {
                     let user = await UserManager.get(request.headOfHouseHoldId)
-                    await user.notifyUserAsync({
+                    let user_notification = {
                         channel: UserNotificationChannelEnum.MealBoxUpdates,
                         messageType: MealBoxUpdatesMessageType.ErrorProcessing,
                         messagePayload: this.RPMSErrors.NoDistributionCenterAvailableInArea
-                    });
+                    };
+                    await user.notifyUserAsync(user_notification);
+                    notification = user_notification;
                 }
             });
+            return distributionCenters || notification;
         } catch (error) {
             console.log(error);
             //TODO: do something
