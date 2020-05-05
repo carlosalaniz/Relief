@@ -1,7 +1,7 @@
 import * as mongoose from "mongoose"
 import { Schema, Types, SchemaType } from "mongoose";
 
-export const SchemaDefinition = new Schema({
+const SchemaDefinition = new Schema({
     channel: String,
 
     messageType: String,

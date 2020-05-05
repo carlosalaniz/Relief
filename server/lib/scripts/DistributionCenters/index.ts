@@ -2,6 +2,7 @@ import { DataModels } from "../../models";
 import { Document, Types } from "mongoose";
 import { DistributionCenterStatusEnum } from "./DistributionCenterStatusEnum";
 import { IDistributionCenter } from "../../models/interfaces/IDistributionCenter";
+import { IAvailableSlot } from "../../models/interfaces/IAvailableSlots";
 import { MealBoxManager } from "../../scripts/MealBox";
 import { _mongooseTransactionAsync } from "../../scripts/common";
 import { IMealBox } from "../../models/interfaces/IMealBox";
@@ -13,13 +14,15 @@ import { MealBoxUpdatesMessageType } from "../../scripts/Users/MealBoxUpdatesMes
 import { TimeSlotStatusEnum } from "./TimeSlotsStatusEnum";
 import { INotification } from "../../models/interfaces/INotification";
 import { DistributionCenterChannelEnum } from "./DistributionCenterChannelEnum";
+import { IUser } from "../../models/interfaces/IUser";
+import { UserRolesEnum } from "../../scripts/Users/userRolesEnum";
 
 var shuffle: <T> (array: T[], options?: { copy: boolean }) => T[] = require("shuffle-array");
 
 type availableSlotsReturnType = {
     slotDay: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-    startTime: Date;
-    endTime: Date;
+    startTime: string;
+    endTime: string;
     slotIndex: number,
     timeIndex: number
 };
@@ -27,6 +30,30 @@ export class DistributionCenterManager {
     static async get(objectId) {
         let result = await DataModels.DistributionCenter.model.findById(objectId);
         return new DistributionCenter(result);
+    };
+    static async create(availableSlots: IAvailableSlot[], host: IUser) {
+        let dCenterData: IDistributionCenter = {
+            host: host._id,
+            status: DistributionCenterStatusEnum.Empty,
+            address: host.address,
+            availableSlots: availableSlots,
+            stock: [],
+            mealBoxQueue: [],
+            notifications: []
+        };
+
+        let distributionCenter = null;
+
+        await _mongooseTransactionAsync(async () => {
+            distributionCenter = await (new DataModels.DistributionCenter.model(dCenterData)).save();
+            let hostDo = <any>await DataModels.User.model.findById(host._id);
+            if (!hostDo.roles.includes(UserRolesEnum.DistributionCenterHost)) {
+                hostDo.roles.push(UserRolesEnum.DistributionCenterHost);
+                await hostDo.save();
+            }
+        });
+
+        return this.get(distributionCenter);
     };
 }
 export class DistributionCenter {
@@ -42,7 +69,6 @@ export class DistributionCenter {
         NoTimeSlotsAvailable: "NoTimeSlotsAvailable",
     }
 
-
     private async refreshDocumentAsync() {
         let result = await DataModels.DistributionCenter.model.findById(this._distributionCenter._id);
         this.init(result);
@@ -51,7 +77,9 @@ export class DistributionCenter {
     private init(distributionCenter: Document) {
         this._distributionCenter = <IDistributionCenter>(<any>distributionCenter);
     }
-
+    public getObject(): IDistributionCenter {
+        return <IDistributionCenter>(<any>this._distributionCenter).toObject();
+    }
     /** PRIVATE METHODS */
 
     private async isStockAvailable() {
@@ -181,23 +209,23 @@ export class DistributionCenter {
                             if (availableSlots.length > 0) {
                                 let headOfHouseHoldId = mealBox._mealBox.beneficiary.headOfHouseHold;
                                 await this.reserveTimeSlotsAsync(availableSlots, mealBox._mealBox);
-                                let user = await UserManager.get(headOfHouseHoldId)
+                                let user = await UserManager.get(headOfHouseHoldId);
                                 await user.notifyUserAsync({
                                     channel: UserNotificationChannelEnum.MealBoxUpdates,
                                     messageType: MealBoxUpdatesMessageType.TimeSelectionMessage,
                                     messagePayload: JSON.stringify(availableSlots)
                                 });
                             } else {
-                                throw new Error(this.errors.NoTimeSlotsAvailable)
+                                throw new Error(this.errors.NoTimeSlotsAvailable);
                             }
                         } else {
-                            throw new Error(this.errors.MealBoxAssigned)
+                            throw new Error(this.errors.MealBoxAssigned);
                         }
                     } else {
-                        throw new Error(this.errors.StockUnAvailable)
+                        throw new Error(this.errors.StockUnAvailable);
                     }
                 });
-                this.refreshDocumentAsync()
+                this.refreshDocumentAsync();
             } catch (error) {
                 let headOfHouseHoldId = mealBox._mealBox.beneficiary.headOfHouseHold;
                 let user = await UserManager.get(headOfHouseHoldId)
@@ -236,7 +264,7 @@ export class DistributionCenter {
         };
     }
 
-    public async confirmTimeSlotAsync(userId: Types.ObjectId, selectedTimeSlot: availableSlotsReturnType, timeSlotOptions: availableSlotsReturnType[]) {
+    public async confirmTimeSlotAsync(userId: Types.ObjectId, selectedTimeSlot: availableSlotsReturnType) {
         let newTimeSlots = this._distributionCenter.availableSlots;
         newTimeSlots[selectedTimeSlot.slotIndex].times[selectedTimeSlot.timeIndex].status = TimeSlotStatusEnum.Confirmed;
         try {

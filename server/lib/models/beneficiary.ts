@@ -3,8 +3,7 @@ import { isAgeGroupValid } from '../scripts/Users/ageGroupsEnum';
 import { UserSchema } from './user';
 import { pointSchema } from './geoJSONPoint';
 import { AddressSchema } from './address';
-import { DataModels } from './';
-import { IUser } from './interfaces/IUser';
+
 const Schema = mongoose.Schema;
 
 function getAge(birthDate: Date): number {

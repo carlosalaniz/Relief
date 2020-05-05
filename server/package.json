@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register tests/**/*.test.ts --exit",
+    "test": "mocha -r ts-node/register tests/**/*.test.ts --timeout 10000 --exit ",
     "build": "tsc",
     "dev": "ts-node ./lib/server.ts",
     "start": "nodemon ./dist/server.js",
@@ -19,7 +19,8 @@
     "express": "^4.17.1",
     "mongoose": "^5.9.11",
     "nodemon": "^2.0.3",
-    "shuffle-array": "^1.0.1"
+    "shuffle-array": "^1.0.1",
+    "superagent": "^5.2.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",

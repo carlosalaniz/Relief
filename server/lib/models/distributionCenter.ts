@@ -6,13 +6,26 @@ import { MealBoxSchema } from './mealBox';
 import { AddressSchema } from './address';
 import { NotificationSchema } from './notification';
 const Schema = mongoose.Schema;
-
+const TimeValidator = {
+    validator: function (v) {
+        return /([0-1][0-9]|2[0-4]):([0-5][0-9]|60)/.test(v);
+    },
+    message: props => `${props.value} is not a time!`
+}
 const availableSlotsSchema = new Schema({
     day: Number,
     times: [
         {
-            startTime: Date,
-            endTime: Date,
+            startTime: {
+                type: String,
+                validate: TimeValidator,
+                required: true
+            },
+            endTime: {
+                type: String,
+                validate: TimeValidator,
+                required: true
+            },
             status: String,
             assignedMealBoxId: {
                 type: mongoose.Types.ObjectId,
@@ -23,12 +36,9 @@ const availableSlotsSchema = new Schema({
 });
 
 const SchemaDefinition = new Schema({
-    name: {
-        type: String
-    },
-
     host: {
-        type: UserSchema.schema,
+        type: mongoose.Types.ObjectId,
+        ref: UserSchema.modelName,
         required: true
     },
 
@@ -51,17 +61,8 @@ const SchemaDefinition = new Schema({
         }]
     },
 
-    address: {
-        type: mongoose.Types.ObjectId,
-        ref: AddressSchema.modelName,
-        required: true
-    },
-
-    location: {
-        type: pointSchema.schema,
-        required: true
-    },
-
+    address: AddressSchema.schema,
+    
     mealBoxQueue: {
         type: [{
             type: mongoose.Types.ObjectId,
@@ -84,6 +85,7 @@ const SchemaDefinition = new Schema({
         default: Date.now
     },
 });
+SchemaDefinition.index({ "address.location": "2dsphere" });
 
 export const DistributionCenterSchema = {
     schema: SchemaDefinition,

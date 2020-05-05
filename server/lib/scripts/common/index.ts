@@ -1,6 +1,6 @@
 import * as mongoose from "mongoose";
 export const defaults = {
-    DistributionCenterDefaultDistanceInMeters: 1000
+    DistributionCenterDefaultDistanceInMeters: 10000
 }
 export async function _mongooseTransactionAsync(_transactionCallbackAsync: () => Promise<void>) {
     const session = await mongoose.startSession();

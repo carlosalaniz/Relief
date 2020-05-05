@@ -4,6 +4,6 @@ export interface IMealBoxItem {
     amount?: number;
     quantity: number;
     quantityUnit: string;
-    item_objectId: Types.ObjectId;
+    itemId: Types.ObjectId;
     item?:IItem
 }

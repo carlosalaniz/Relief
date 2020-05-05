@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-export const SchemaDefinition = new mongoose.Schema({
+const SchemaDefinition = new mongoose.Schema({
     type: {
         type: String,
         enum: ['Point'],
@@ -15,5 +15,5 @@ export const SchemaDefinition = new mongoose.Schema({
 export const pointSchema = {
     schema: SchemaDefinition,
     modelName: "point",
-    model: mongoose.model( "point", SchemaDefinition)
+    model: mongoose.model("point", SchemaDefinition)
 }

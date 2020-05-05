@@ -1,6 +1,7 @@
 import * as mongoose from "mongoose";
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { DataModels } from "../lib/models";
 
 export async function dropAllCollectionsAsync(mongoose: mongoose.Mongoose) {
     let collections = mongoose.connection.collections;
@@ -23,7 +24,8 @@ export function initMongo() {
         mongoose.connect(process.env.DB_CONNECTION_STRING, {
             useCreateIndex: true,
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            useFindAndModify: false
         });
     }
     //initialize mongo

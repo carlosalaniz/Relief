@@ -10,6 +10,7 @@ import { DistributionCenterManager } from "../../scripts/DistributionCenters";
 import { UserManager } from "../../scripts/Users";
 import { UserNotificationChannelEnum } from "../../scripts/common/UserNotificationChannelEnum";
 import { MealBoxUpdatesMessageType } from "../../scripts/Users/MealBoxUpdatesMessageType";
+import { INotification } from "../../models/interfaces/INotification";
 
 export class RPMS {
     private RPMSErrors = {
@@ -21,7 +22,7 @@ export class RPMS {
             {
                 quantity: 70,
                 quantityUnit: "oz",
-                item_objectId: null,
+                itemId: null,
                 item: {
                     itemName: "Pinto Beans",
                     pictureUrl: "https://images.heb.com/is/image/HEBGrocery/000125682",
@@ -36,7 +37,7 @@ export class RPMS {
             {
                 quantity: 50,
                 quantityUnit: "oz",
-                item_objectId: null,
+                itemId: null,
                 item: {
                     itemName: "Canned Chicken",
                     pictureUrl: "https://images.heb.com/is/image/HEBGrocery/prd-small/h-e-b-select-ingredients-premium-chunk-chicken-breast-in-water-000783220.jpg",
@@ -51,7 +52,7 @@ export class RPMS {
             {
                 quantity: 50,
                 quantityUnit: "oz",
-                item_objectId: null,
+                itemId: null,
                 item: {
                     itemName: "Dry Milk",
                     pictureUrl: "https://i5.walmartimages.com/asr/477c9d7a-6d77-4850-b73f-d64663bbf5cc_1.5055a33b6f19ee5f896bb6f30ad9efcf.jpeg",
@@ -66,7 +67,7 @@ export class RPMS {
             {
                 quantity: 1080,
                 quantityUnit: "g",
-                item_objectId: null,
+                itemId: null,
                 item: {
                     itemName: "Apple sauce pouch",
                     pictureUrl: "https://images.heb.com/is/image/HEBGrocery/001800558",
@@ -86,21 +87,29 @@ export class RPMS {
         if (!distanceInMeters) distanceInMeters = defaults.DistributionCenterDefaultDistanceInMeters;
         const distributionCenters = DataModels.DistributionCenter.model;
         try {
-            let result = await distributionCenters.find({
-                location: {
-                    $near: {
-                        $maxDistance: distanceInMeters,
-                        $geometry: pointGeometry
+            let result = await distributionCenters.aggregate(
+                [
+                    {
+                        "$geoNear": {
+                            "near": {
+                                "type": "Point",
+                                "coordinates": [-97.62774, 30.41591]
+                            },
+
+                            "spherical": true,
+                            "distanceField": "distance",
+                            "maxDistance": distanceInMeters,
+                        }
                     }
-                }
-            });
+                ]);
             return result;
         } catch (error) {
-            //TODO: do something
+            console.log(error);
         }
     }
 
-    public async handleMealBoxRequestAsync(request: RequestMealBox) {
+    public async handleMealBoxRequestAsync(request: RequestMealBox)
+        : Promise<{ mealBox: IMealBox, response: [] | INotification }> {
         let requiredItems: IMealBoxItem[] = this.getRequiredItems(request.householdInformation);
         let mealBoxRequest: IMealBox = {
             beneficiary: {
@@ -115,22 +124,26 @@ export class RPMS {
         try {
             let notification = null;
             let distributionCenters = null
+            let mealBox = null;
             await _mongooseTransactionAsync(async () => {
-                let mealBox = await MealBoxModel.save();
+                mealBox = await MealBoxModel.save();
                 let closestDistributionCenters = await this.findCloseByDistributionCentersAsync(request.location);
                 if (closestDistributionCenters.length > 0) {
-                    closestDistributionCenters.forEach(async distributionCenterDocument => {
+                    for (let i = 0; i < closestDistributionCenters.length; i++) {
+                        let distributionCenterDocument = closestDistributionCenters[i];
                         try {
                             let distributionCenter = await DistributionCenterManager.get(distributionCenterDocument._id);
                             await distributionCenter.addRequestToProcessQueueAsync(<IMealBox>(<any>mealBox));
                         } catch (error) {
+                            console.log(error);
+                            throw error;
                             //TODO: do something
                         }
-                    })
+                    }
                     distributionCenters = closestDistributionCenters;
                 } else {
                     let user = await UserManager.get(request.headOfHouseHoldId)
-                    let user_notification = {
+                    let user_notification: INotification = {
                         channel: UserNotificationChannelEnum.MealBoxUpdates,
                         messageType: MealBoxUpdatesMessageType.ErrorProcessing,
                         messagePayload: this.RPMSErrors.NoDistributionCenterAvailableInArea
@@ -139,7 +152,10 @@ export class RPMS {
                     notification = user_notification;
                 }
             });
-            return distributionCenters || notification;
+            return {
+                mealBox: <IMealBox>mealBox.toObject(),
+                response: distributionCenters || notification
+            };
         } catch (error) {
             console.log(error);
             //TODO: do something

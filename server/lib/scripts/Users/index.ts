@@ -10,15 +10,11 @@ export class UserManager {
         let result = await DataModels.User.model.findById(objectId);
         return new User(result);
     };
-    static async create(user: IUser, address: IAddress): Promise<Document> {
-        let addressDocument = await AddressManager.create(address);
-        user.address = addressDocument._id;
-
+    static async create(user: IUser): Promise<Document> {
         let result = null;
         await _mongooseTransactionAsync(async () => {
             result = await new DataModels.User.model(user).save()
         });
-
         return result;
     }
 }
@@ -28,7 +24,7 @@ export class User {
     private _user: IUser;
 
     private init(userDocument: Document) {
-        this._user = <IUser>(<any>userDocument);
+        this._user = <IUser>(userDocument.toObject());
         this._userDocument = userDocument;
     }
 

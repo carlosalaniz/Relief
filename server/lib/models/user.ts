@@ -27,9 +27,7 @@ const SchemaDefinition = new Schema({
         required: 'dateOfBirth is required.'
     },
 
-    address: {
-        type: mongoose.Types.ObjectId, ref: AddressSchema.modelName
-    },
+    address: AddressSchema.schema,
 
     notifications: [{
         type: mongoose.Types.ObjectId,
