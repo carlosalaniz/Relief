@@ -26,7 +26,7 @@ class MealBox {
             this._mealBox._id,
             { 
                 distributionCenter: distributionCenter._id,
-                status: MealBoxStates.assigned_to_distribution_center
+                status: MealBoxStates.pending_beneficiary_confirmation
             },
             { new: true }
         );

@@ -1,5 +1,5 @@
 export enum MealBoxStates {
     pending_processing = "pending_processing",
-    assigned_to_distribution_center = "assigned_to_distribution_center",
+    pending_beneficiary_confirmation = "pending_beneficiary_confirmation",
     processed = "processed"
 }
