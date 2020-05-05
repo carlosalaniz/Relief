@@ -93,24 +93,27 @@ export class DistributionCenter {
     }
 
     private getAvailableTimeSlots(): availableSlotsReturnType[] {
-        let availableSlots = this._distributionCenter.availableSlots
-            .map((day, index) => {
-                day['index'] = index;
-                day.times = day.times.map((time, index) => {
+        let today = new Date();
+        let allSlots = this._distributionCenter.availableSlots;
+        let availableSlots = allSlots
+            .map((slot, index) => {
+                slot['index'] = index;
+                slot.times = slot.times.map((time, index) => {
                     time['index'] = index;
                     return time;
-                }).filter(time => !time.assignedMealBoxId);
-                return day;
+                }).filter(time => !time.assignedMealBoxId && time.status === TimeSlotStatusEnum.Open);
+                return slot;
             })
-            .filter(day => day.times.length > 0)
+            // TODO: add logic to account for hours of the day, select every time slot where day and time is at least X hours away
+            .filter(day => day.day > today.getDay() && day.times.length > 0)
             .map((slot, slotIndex) => {
                 return slot.times.map((time, timeIndex) => {
                     let timeObj = {
                         slotDay: slot.day,
                         startTime: time.startTime,
                         endTime: time.endTime,
-                        slotIndex: slotIndex,
-                        timeIndex: timeIndex
+                        slotIndex: slot['index'],
+                        timeIndex: time['index']
                     }
                     return timeObj;
                 })
@@ -179,8 +182,7 @@ export class DistributionCenter {
             let mealBoxId = queue.shift();
             let mealBox = await MealBoxManager.get(mealBoxId);
 
-            if (mealBox._mealBox.status === MealBoxStates.pending_processing
-                && !await this.isStockAvailable()) {
+            if (!await this.isStockAvailable()) {
                 // send signal
                 await this.notifyDistributionCenter(
                     {
@@ -196,14 +198,15 @@ export class DistributionCenter {
                 });
 
                 //end loop
-                break;
+                return;
             }
 
+            if (mealBox._mealBox.status !== MealBoxStates.pending_processing) continue;
 
             try {
                 await _mongooseTransactionAsync(async () => {
                     if (await this.reserveStockAsync()) {
-                        let mealBoxAssigned = mealBox.assignMealBox(this._distributionCenter);
+                        let mealBoxAssigned = await mealBox.assignMealBox(this._distributionCenter);
                         if (mealBoxAssigned) {
                             let availableSlots = this.getAvailableTimeSlots();
                             if (availableSlots.length > 0) {
@@ -225,7 +228,7 @@ export class DistributionCenter {
                         throw new Error(this.errors.StockUnAvailable);
                     }
                 });
-                this.refreshDocumentAsync();
+                await this.refreshDocumentAsync();
             } catch (error) {
                 let headOfHouseHoldId = mealBox._mealBox.beneficiary.headOfHouseHold;
                 let user = await UserManager.get(headOfHouseHoldId)

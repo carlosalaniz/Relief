@@ -229,7 +229,7 @@ async function InsertDistributionCenter2(host: IUser) {
             ]
         }
     ];
-    let distributionCenter = DistributionCenterManager.create(availableSlots, host);
+    let distributionCenter = await DistributionCenterManager.create(availableSlots, host);
     return distributionCenter;
 }
 
@@ -300,8 +300,6 @@ async function InsertDistributionCenter3(host: IUser) {
     return distributionCenter;
 }
 
-
-
 async function issueMealBoxRequest(user: IUser) {
 
     let RequestMealBox: RequestMealBox = {
@@ -332,53 +330,98 @@ async function issueMealBoxRequest(user: IUser) {
     return handleResponse;
 }
 
-describe('Insertions', function () {
-    it('Insert User', async function () {
-        // Drop everything before starting
-        await dropAllCollectionsAsync(mongoose);
+// describe('Insertions', function () {
+//     it('Insert User', async function () {
+//         // Drop everything before starting
+//         await dropAllCollectionsAsync(mongoose);
 
-        // Insert user
-        let user = await InsertUser();
+//         // Insert user
+//         let user = await InsertUser();
 
-        // Document to Object
-        let obj = user.getObject();
-        assert(obj);
-    });
-});
+//         // Document to Object
+//         let obj = user.getObject();
+//         assert(obj);
+//     });
+
+//     it('Create Meal Box Request - No Distribution centers in area', async function () {
+//         // Drop everything before starting
+//         await dropAllCollectionsAsync(mongoose);
+
+//         // Insert user
+//         let user = await InsertUser();
+
+//         // Issue a request for a Meal Box
+//         await DataModels.DistributionCenter.model.ensureIndexes();
+//         let handleResponse = await issueMealBoxRequest(user.getObject());
+
+//         let beforeNotifications = user.getObject().notifications;
+//         let afterNotifications = await (await UserManager.get(user.getObject()._id)).getObject().notifications;
+//         let notification = <INotification>(<any>await DataModels.Notification.model.findById(afterNotifications[0]));
+
+//         // Check that teh response is a notification
+//         expect(handleResponse.response).to.haveOwnProperty("channel");
+
+//         // No notification present in the user model before the request got processed
+//         expect(beforeNotifications.length).to.equal(0);
+
+//         // Exactly one notification for user after the request got handled 
+//         expect(afterNotifications.length).to.equal(1);
+
+//         // Check that the notification contents are correct
+//         expect(notification.channel).to.equal("MealBoxUpdates");
+//         expect(notification.messageType).to.equal("ErrorProcessing");
+//         expect(notification.messagePayload).to.equal("NoDistributionCenterAvailableInArea");
+//     })
+
+//     it('Create Meal Box Request - Distribution centers in area', async function () {
+//         // Drop everything before starting
+//         await dropAllCollectionsAsync(mongoose);
+
+//         // Insert users
+//         let host = await InsertUser();
+//         let host2 = await InsertUser2();
+//         let host3 = await InsertUser3();
+
+//         let user = await InsertUser4();
+
+//         // Insert distribution centers
+//         await DataModels.DistributionCenter.model.ensureIndexes();
+//         let distributionCenterBefore = await InsertDistributionCenter(host.getObject());
+//         let distributionCenterBefore2 = await InsertDistributionCenter2(host2.getObject());
+//         let distributionCenterBefore3 = await InsertDistributionCenter3(host3.getObject());
+
+//         // Issue a request for a Meal Box
+//         let handleResponse = await issueMealBoxRequest(user.getObject());
+
+//         expect(handleResponse.response).to.be.an("array").and.to.have.lengthOf(3);
+
+//         let distributionCenterAfter =
+//             (await DistributionCenterManager.get(distributionCenterBefore.getObject()._id))
+//                 .getObject();
+//         let distributionCenterAfter2 =
+//             (await DistributionCenterManager.get(distributionCenterBefore2.getObject()._id))
+//                 .getObject();
+//         let distributionCenterAfter3 =
+//             (await DistributionCenterManager.get(distributionCenterBefore3.getObject()._id))
+//                 .getObject();
+
+//         expect(distributionCenterAfter.mealBoxQueue).to.be.an("array").and.to.have.lengthOf(1);
+//         expect(distributionCenterAfter2.mealBoxQueue).to.be.an("array").and.to.have.lengthOf(1);
+//         expect(distributionCenterAfter3.mealBoxQueue).to.be.an("array").and.to.have.lengthOf(1);
+
+//         let distributionCenter1MealBoxId = distributionCenterAfter.mealBoxQueue[0].toString();
+//         let distributionCenter2MealBoxId = distributionCenterAfter2.mealBoxQueue[0].toString();
+//         let distributionCenter3MealBoxId = distributionCenterAfter3.mealBoxQueue[0].toString();
+
+//         let mealBoxId = handleResponse.mealBox._id.toString();
+//         expect(distributionCenter1MealBoxId).to.equal(mealBoxId)
+//         expect(distributionCenter2MealBoxId).to.equal(mealBoxId)
+//         expect(distributionCenter3MealBoxId).to.equal(mealBoxId)
+//     })
+// });
 
 describe('Queue processing', function () {
-
-    it('Create Meal Box Request - No Distribution centers in area', async function () {
-        // Drop everything before starting
-        await dropAllCollectionsAsync(mongoose);
-
-        // Insert user
-        let user = await InsertUser();
-
-        // Issue a request for a Meal Box
-        await DataModels.DistributionCenter.model.ensureIndexes();
-        let handleResponse = await issueMealBoxRequest(user.getObject());
-
-        let beforeNotifications = user.getObject().notifications;
-        let afterNotifications = await (await UserManager.get(user.getObject()._id)).getObject().notifications;
-        let notification = <INotification>(<any>await DataModels.Notification.model.findById(afterNotifications[0]));
-
-        // Check that teh response is a notification
-        expect(handleResponse.response).to.haveOwnProperty("channel");
-
-        // No notification present in the user model before the request got processed
-        expect(beforeNotifications.length).to.equal(0);
-
-        // Exactly one notification for user after the request got handled 
-        expect(afterNotifications.length).to.equal(1);
-
-        // Check that the notification contents are correct
-        expect(notification.channel).to.equal("MealBoxUpdates");
-        expect(notification.messageType).to.equal("ErrorProcessing");
-        expect(notification.messagePayload).to.equal("NoDistributionCenterAvailableInArea");
-    })
-
-    it('Create Meal Box Request - Distribution centers in area', async function () {
+    it('Process Queue on all Distribution Centers ', async function () {
         // Drop everything before starting
         await dropAllCollectionsAsync(mongoose);
 
@@ -394,34 +437,27 @@ describe('Queue processing', function () {
         let distributionCenterBefore = await InsertDistributionCenter(host.getObject());
         let distributionCenterBefore2 = await InsertDistributionCenter2(host2.getObject());
         let distributionCenterBefore3 = await InsertDistributionCenter3(host3.getObject());
-
+        let stockedDC = distributionCenterBefore2.getObject();
+        await DataModels.DistributionCenter.model.findByIdAndUpdate(stockedDC._id, {
+            status: DistributionCenterStatusEnum.Stocked
+        })
         // Issue a request for a Meal Box
         let handleResponse = await issueMealBoxRequest(user.getObject());
 
         expect(handleResponse.response).to.be.an("array").and.to.have.lengthOf(3);
 
         let distributionCenterAfter =
-            (await DistributionCenterManager.get(distributionCenterBefore.getObject()._id))
-                .getObject();
+            (await DistributionCenterManager.get(distributionCenterBefore.getObject()._id));
         let distributionCenterAfter2 =
-            (await DistributionCenterManager.get(distributionCenterBefore2.getObject()._id))
-                .getObject();
+            (await DistributionCenterManager.get(distributionCenterBefore2.getObject()._id));
         let distributionCenterAfter3 =
-            (await DistributionCenterManager.get(distributionCenterBefore3.getObject()._id))
-                .getObject();
+            (await DistributionCenterManager.get(distributionCenterBefore3.getObject()._id));
 
-        expect(distributionCenterAfter.mealBoxQueue).to.be.an("array").and.to.have.lengthOf(1);
-        expect(distributionCenterAfter2.mealBoxQueue).to.be.an("array").and.to.have.lengthOf(1);
-        expect(distributionCenterAfter3.mealBoxQueue).to.be.an("array").and.to.have.lengthOf(1);
+        await distributionCenterAfter.processQueueElementsAsync();
 
-        let distributionCenter1MealBoxId = distributionCenterAfter.mealBoxQueue[0].toString();
-        let distributionCenter2MealBoxId = distributionCenterAfter2.mealBoxQueue[0].toString();
-        let distributionCenter3MealBoxId = distributionCenterAfter3.mealBoxQueue[0].toString();
-
-        let mealBoxId = handleResponse.mealBox._id.toString();
-        expect(distributionCenter1MealBoxId).to.equal(mealBoxId)
-        expect(distributionCenter2MealBoxId).to.equal(mealBoxId)
-        expect(distributionCenter3MealBoxId).to.equal(mealBoxId)
+        await distributionCenterAfter2.processQueueElementsAsync();
     })
+
+
 
 })
