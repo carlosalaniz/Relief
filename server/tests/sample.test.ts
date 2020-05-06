@@ -453,8 +453,9 @@ describe('Queue processing', function () {
         let distributionCenterAfter3 =
             (await DistributionCenterManager.get(distributionCenterBefore3.getObject()._id));
 
+        // No stock, 
         await distributionCenterAfter.processQueueElementsAsync();
-
+        
         await distributionCenterAfter2.processQueueElementsAsync();
     })
 

@@ -77,6 +77,7 @@ export class DistributionCenter {
     private init(distributionCenter: Document) {
         this._distributionCenter = <IDistributionCenter>(<any>distributionCenter);
     }
+
     public getObject(): IDistributionCenter {
         return <IDistributionCenter>(<any>this._distributionCenter).toObject();
     }
@@ -106,7 +107,7 @@ export class DistributionCenter {
             })
             // TODO: add logic to account for hours of the day, select every time slot where day and time is at least X hours away
             .filter(day => day.day > today.getDay() && day.times.length > 0)
-            .map((slot, slotIndex) => {
+            .map((slot) => {
                 return slot.times.map((time, timeIndex) => {
                     let timeObj = {
                         slotDay: slot.day,
